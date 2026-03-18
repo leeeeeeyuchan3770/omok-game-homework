@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1">&lt;title&gt;오목 (LinkedList)&lt;/title&gt;</p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1">body { display:flex; justify-content:center; gap:20px; font-family:sans-serif; }</p>
+<p class="p1">canvas { border:2px solid black; }</p>
+<p class="p1">#moves { width:200px; }</p>
+<p class="p1">.move { margin:4px; padding:4px; background:#eee; border-radius:4px; }</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;canvas id="board" width="600" height="600"&gt;&lt;/canvas&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div id="moves"&gt;</p>
+<p class="p1">&lt;h3&gt;수순 (LinkedList)&lt;/h3&gt;</p>
+<p class="p1">&lt;div id="list"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">// ===== 연결리스트 =====</p>
+<p class="p1">class Node {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>constructor(x,y,player){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>this.x = x;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>this.y = y;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>this.player = player;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>this.next = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">class LinkedList {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>constructor(){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>this.head = null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>this.tail = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>append(x,y,player){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const n = new Node(x,y,player);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!this.head){</p>
+<p class="p1"><span class="Apple-converted-space">            </span>this.head = this.tail = n;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>this.tail.next = n;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>this.tail = n;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>toArray(){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let arr = [];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let cur = this.head;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>while(cur){</p>
+<p class="p1"><span class="Apple-converted-space">            </span>arr.push(cur);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cur = cur.next;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return arr;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== 게임 설정 =====</p>
+<p class="p1">const SIZE = 15;</p>
+<p class="p1">const CELL = 40;</p>
+<p class="p2"><br></p>
+<p class="p1">let board = Array.from({length: SIZE}, () =&gt; Array(SIZE).fill(0));</p>
+<p class="p1">let turn = 1;</p>
+<p class="p2"><br></p>
+<p class="p1">const moves = new LinkedList();</p>
+<p class="p2"><br></p>
+<p class="p1">const canvas = document.getElementById("board");</p>
+<p class="p1">const ctx = canvas.getContext("2d");</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== 보드 그리기 =====</p>
+<p class="p1">function drawBoard(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for(let i=0;i&lt;SIZE;i++){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.beginPath();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.moveTo(CELL/2, CELL/2 + i*CELL);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.lineTo(CELL/2+(SIZE-1)*CELL, CELL/2+i*CELL);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.stroke();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.beginPath();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.moveTo(CELL/2+i*CELL, CELL/2);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.lineTo(CELL/2+i*CELL, CELL/2+(SIZE-1)*CELL);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.stroke();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== 돌 그리기 =====</p>
+<p class="p1">function drawStone(x,y,player){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ctx.beginPath();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ctx.arc(CELL/2+x*CELL, CELL/2+y*CELL, 15, 0, Math.PI*2);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ctx.fillStyle = player===1 ? "black" : "white";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ctx.fill();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ctx.stroke();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== 승리 판정 =====</p>
+<p class="p1">function checkWin(x,y){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const dirs = [[1,0],[0,1],[1,1],[1,-1]];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>for(let [dx,dy] of dirs){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let count = 1;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>for(let i=1;i&lt;5;i++){</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let nx = x+dx*i, ny = y+dy*i;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(board[ny]?.[nx] === turn) count++;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>else break;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>for(let i=1;i&lt;5;i++){</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let nx = x-dx*i, ny = y-dy*i;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(board[ny]?.[nx] === turn) count++;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>else break;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(count &gt;= 5) return true;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return false;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== 클릭 이벤트 =====</p>
+<p class="p1">canvas.addEventListener("click",(e)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const rect = canvas.getBoundingClientRect();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const x = Math.round((e.clientX-rect.left-CELL/2)/CELL);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const y = Math.round((e.clientY-rect.top-CELL/2)/CELL);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(board[y][x] !== 0) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>board[y][x] = turn;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>moves.append(x,y,turn); // 🔥 연결리스트 사용</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drawStone(x,y,turn);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>renderMoves();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(checkWin(x,y)){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setTimeout(()=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>alert((turn===1?"흑":"백")+" 승리!");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>location.reload();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>},100);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>turn = turn===1 ? 2 : 1;</p>
+<p class="p1">});</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== 수순 표시 =====</p>
+<p class="p1">function renderMoves(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const listDiv = document.getElementById("list");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>listDiv.innerHTML = "";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let arr = moves.toArray();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>arr.forEach((m)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let d = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>d.className = "move";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>d.innerText = (m.player===1?"●":"○") + " ("+m.x+","+m.y+")";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>listDiv.appendChild(d);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== 실행 =====</p>
+<p class="p1">drawBoard();</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
